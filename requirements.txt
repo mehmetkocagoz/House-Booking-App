@@ -1,0 +1,8 @@
+Flask==3.0.0
+Werkzeug==3.0.1
+pyodbc
+fastapi
+uvicorn[standard]
+pydantic
+azure-identity
+python-dotenv==0.19.1
