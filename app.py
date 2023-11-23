@@ -14,16 +14,19 @@ def home():
 
 def token_required(func):
     @wraps(func)
-    def decorated(*args,**kwargs):
+    def decorated(*args, **kwargs):
         token = request.args.get('token')
         if not token:
-            return jsonify({'Alert!':'Token is missing!'})
+            return jsonify({'Alert!': 'Token is missing!'})
         try:
-            payload = jwt.decode(token,app.config['SECRET_KEY'])
-        except:
-            return jsonify({'Alert!':'Invalid Token'})
-        return func(*args,**kwargs)
+            payload = jwt.decode(token, app.config['SECRET_KEY'],algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'Alert!': 'Token has expired!'}), 401
+        except jwt.InvalidTokenError as e:
+            return jsonify({'Alert!': f'Invalid Token: {str(e)}'}), 401
+        return func(*args, **kwargs)
     return decorated
+
 
 @app.route('/login', methods=['POST'])
 def login_post():
