@@ -96,3 +96,30 @@ def getHousesWithCity(city):
         # Close the connection
         if connection:
             connection.close()
+
+def checkUser(username,password):
+    try:
+        # Establish a connection
+        connection = conn()
+
+        if connection:
+                    # Create a cursor from the connection
+                    with connection.cursor() as cursor:
+                        # Execute a SELECT query to check user credentials
+                        query = "SELECT * FROM UsersWithPlainTextPassword WHERE username = ? AND password = ?"
+                        cursor.execute(query, username, password)
+
+                        # Fetch the result
+                        user_data = cursor.fetchone()
+
+                        if user_data:
+                            # User exists and credentials are correct
+                            return True
+                        else:
+                            # User does not exist or credentials are incorrect
+                            return False
+                        
+    except pyodbc.Error as ex:
+        sqlstate = ex.args[1]
+        print(f"Error executing the query. SQLState: {sqlstate}")
+        return None

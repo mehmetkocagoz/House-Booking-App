@@ -1,18 +1,65 @@
 from flask import Flask,request,jsonify,Response
-from db import getHouses, getHousesWithCity
+from db import getHouses, getHousesWithCity,checkUser
 import json
+import jwt
+from datetime import datetime,timedelta
+from functools import wraps
 
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = 'examplesecretkey'
 
 @app.route('/')
 def home():
     return "Hello From Flask!"
 
+def token_required(func):
+    @wraps(func)
+    def decorated(*args,**kwargs):
+        token = request.args.get('token')
+        if not token:
+            return jsonify({'Alert!':'Token is missing!'})
+        try:
+            payload = jwt.decode(token,app.config['SECRET_KEY'])
+        except:
+            return jsonify({'Alert!':'Invalid Token'})
+        return func(*args,**kwargs)
+    return decorated
+
+@app.route('/login', methods=['POST'])
+def login_post():
+    try:
+        # Get JSON data from the request
+        data = request.get_json()
+
+        # Extract username and password from the JSON data
+        username = data.get('username')
+        password = data.get('password')
+
+        # Validate the credentials
+        if checkUser(username,password):
+            # Successful login
+            token = jwt.encode({
+                'user':username,
+                'expiration': str(datetime.utcnow() + timedelta(seconds=240))
+            },
+            app.config['SECRET_KEY'])
+            decoded_token = token
+            response_data = {'message': 'Login successful','Token': decoded_token}
+            return jsonify(response_data), 200
+        else:
+            # Failed login
+            response_data = {'error': 'Invalid credentials'}
+            return jsonify(response_data), 401
+
+    except Exception as e:
+        # Handle exceptions or errors
+        return jsonify({'error': str(e)}), 400
+
 
 @app.route('/houses')
+@token_required
 def all_houses():
-    
+
     houses_data = getHouses()
 
     if houses_data is not None:
