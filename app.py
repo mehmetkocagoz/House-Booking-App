@@ -38,21 +38,21 @@ def houses_with_query():
 
     house_list_for_given_city = getHousesWithCity(city)
 
-    # Build pagination information
-    pagination_info = {
-        'page': page,
-        'per_page': per_page,
-        'total_pages': 1,  # Update this based on the actual total pages
-        'total_items': len(house_list_for_given_city),  # Update this based on the actual total items
-    }
+    total_house_count = len(house_list_for_given_city)
+    total_pages = (total_house_count + per_page - 1) // per_page
 
+    start_index = (page - 1) * per_page
+    end_index = min(page * per_page, total_house_count)
+
+    house_list_for_given_page = house_list_for_given_city[start_index:end_index]
      # Construct the final response
     response_data = {
-        'houses': house_list_for_given_city,
-        'pagination': pagination_info,
+        'houses': house_list_for_given_page,
+        'pageNumber': page,
+        'totalPages': total_pages
     }
 
-    return jsonify(response_data)
+    return Response(json.dumps(response_data,indent=2),content_type='application/json; charset=utf-8')
 
 if __name__ == '__main__':
     app.run()
