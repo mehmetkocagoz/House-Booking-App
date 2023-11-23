@@ -1,9 +1,10 @@
-from flask import Flask,request,jsonify,Response
+from flask import Flask,request,jsonify,Response,send_from_directory
 from db import getHouses, getHousesWithCity,checkUser
 import json
 import jwt
 from datetime import datetime,timedelta
 from functools import wraps
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'examplesecretkey'
@@ -11,6 +12,21 @@ app.config['SECRET_KEY'] = 'examplesecretkey'
 @app.route('/')
 def home():
     return "Hello From Flask!"
+
+@app.route('/static/<path:path>')
+def send_static(path):
+    return send_from_directory('static',path)
+
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name' : 'Flask API'
+    }
+)
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 def token_required(func):
     @wraps(func)
