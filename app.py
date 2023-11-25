@@ -78,10 +78,24 @@ def login_post():
 @app.route('/houses')
 def all_houses():
 
+     # Set default values for pagination
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 5))
+
     houses_data = getHouses()
 
+    total_house_count = len(houses_data)
+    total_pages = (total_house_count + per_page - 1) // per_page
+
+    start_index = (page - 1) * per_page
+    end_index = min(page * per_page, total_house_count)
+
     if houses_data is not None:
-        response_data = {'houses': houses_data}
+        house_list_for_given_page = houses_data[start_index:end_index]
+
+        response_data = {'houses': house_list_for_given_page,
+        'pageNumber': page,
+        'totalPages': total_pages}
     else:
         response_data = {'error': 'Failed to fetch houses data'}
     
@@ -95,28 +109,15 @@ def houses_with_query():
     city = request.args.get('city')
     date_from = request.args.get('datefrom')
     date_to = request.args.get('dateto')
-    number_of_peoples = request.args.get('numberofpeople')
+    number_of_peoples = int(request.args.get('numberofpeople',1))
 
-    # Set default values for pagination
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 5))
 
     house_list_for_given_city = getHousesWithCity(city)
 
-    filtered_houses = [house for house in house_list_for_given_city if int(house.get('MAX_PEOPLE', 0)) >= int(number_of_peoples)]
+    filtered_houses = [house for house in house_list_for_given_city if int(house.get('MAX_PEOPLE', 0)) >= number_of_peoples]
 
-    total_house_count = len(filtered_houses)
-    total_pages = (total_house_count + per_page - 1) // per_page
-
-    start_index = (page - 1) * per_page
-    end_index = min(page * per_page, total_house_count)
-
-    house_list_for_given_page = filtered_houses[start_index:end_index]
-     # Construct the final response
     response_data = {
-        'houses': house_list_for_given_page,
-        'pageNumber': page,
-        'totalPages': total_pages
+        'houses': filtered_houses
     }
 
     return Response(json.dumps(response_data,indent=2),content_type='application/json; charset=utf-8')
@@ -132,27 +133,38 @@ def book_a_stay():
         date_from = data.get('date_from')
         names = data.get('names')
 
-        isBooked = bookAStayForGivenID(houseID)
+        number_of_people_in_query = len(names)
 
-        if isBooked is not None:
-            if isBooked[5] == 'FALSE':
-                response ={
+        house = bookAStayForGivenID(houseID)
+
+        if house is not None:
+            if house[5] == 'FALSE':
+                #Check if max_people of the house is less than given names length
+                if house[2] < number_of_people_in_query:
+                    response ={
+                        'message' : 'So much people for this house'
+                    }
+                    return Response(json.dumps(response,indent=2),status=400,content_type='application/json; charset=utf-8')
+                
+                else: 
+                    response ={
                     'houseID': houseID,
-                    'city': isBooked[1],
+                    'city': house[1],
                     'date_to': date_to,
                     'date_from': date_from,
                     'Confirmation': 'Booking succeed'
                 }
-            updateBookInformation(houseID)
-            return Response(json.dumps(response,indent=2),content_type='application/json; charset=utf-8')
+                    
+                updateBookInformation(houseID)
+                return Response(json.dumps(response,indent=2),status=200,content_type='application/json; charset=utf-8')
+            
         else:
             response={
                 'message':'Booking failed'
             }
-        return Response(json.dumps(response,indent=2),content_type='application/json; charset=utf-8')
+        return Response(json.dumps(response,indent=2),status=400,content_type='application/json; charset=utf-8')
 
     except Exception as e:
-        # Handle exceptions or errors
         return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
