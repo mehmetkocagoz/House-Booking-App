@@ -1,5 +1,5 @@
 from flask import Flask,request,jsonify,Response,send_from_directory
-from db import getHouses, getHousesWithCity,checkUser
+from db import getHouses, getHousesWithCity,checkUser,bookAStayForGivenID,updateBookInformation
 import json
 import jwt
 from datetime import datetime,timedelta
@@ -51,8 +51,8 @@ def login_post():
         data = request.get_json()
 
         # Extract username and password from the JSON data
-        username = data.get('username')
-        password = data.get('password')
+        username = data.get('houseID')
+        password = data.get('data_to')
 
         # Validate the credentials
         if checkUser(username,password):
@@ -119,6 +119,39 @@ def houses_with_query():
     }
 
     return Response(json.dumps(response_data,indent=2),content_type='application/json; charset=utf-8')
+
+@app.route('/bookstay', methods=['POST'])
+def book_a_stay():
+    try:
+        data = request.get_json()
+
+        houseID = data.get('houseID')
+        date_to = data.get('date_to')
+        date_from = data.get('date_from')
+        names = data.get('names')
+
+        isBooked = bookAStayForGivenID(houseID)
+
+        if isBooked is not None:
+            if isBooked[5] == 'FALSE':
+                response ={
+                    'houseID': houseID,
+                    'city': isBooked[1],
+                    'date_to': date_to,
+                    'date_from': date_from,
+                    'Confirmation': 'Booking succeed'
+                }
+            updateBookInformation(houseID)
+            return Response(json.dumps(response,indent=2),content_type='application/json; charset=utf-8')
+        else:
+            response={
+                'message':'Booking failed'
+            }
+        return Response(json.dumps(response,indent=2),content_type='application/json; charset=utf-8')
+
+    except Exception as e:
+        # Handle exceptions or errors
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     app.run()
