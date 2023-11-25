@@ -123,3 +123,37 @@ def checkUser(username,password):
         sqlstate = ex.args[1]
         print(f"Error executing the query. SQLState: {sqlstate}")
         return None
+    
+def bookAStayForGivenID(houseID):
+    try:
+        connection = conn()
+
+        if connection:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM houses WHERE houseID = ?", (houseID,))
+                house_data = cursor.fetchone()
+
+                if house_data is not None:
+                    return house_data
+                else:
+                    return None
+    except pyodbc.Error as ex:
+        sqlstate = ex.args[1]
+        print(f"Error executing the query. SQLState: {sqlstate}")
+        return None
+    
+def updateBookInformation(houseID):
+    try:
+        connection = conn()
+
+        if connection:
+            with connection.cursor() as cursor:
+                update_query = "UPDATE houses SET isBooked = ? WHERE houseID = ?"
+                cursor.execute(update_query, ('TRUE', houseID))
+
+    except pyodbc.Error as ex:
+        sqlstate = ex.args[1]
+        print(f"Error executing the query. SQLState: {sqlstate}")
+    finally:
+        if connection:
+            connection.close()
