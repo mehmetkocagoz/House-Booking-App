@@ -76,7 +76,6 @@ def login_post():
 
 
 @app.route('/houses')
-@token_required
 def all_houses():
 
     houses_data = getHouses()
@@ -121,6 +120,7 @@ def houses_with_query():
     return Response(json.dumps(response_data,indent=2),content_type='application/json; charset=utf-8')
 
 @app.route('/bookstay', methods=['POST'])
+@token_required
 def book_a_stay():
     try:
         data = request.get_json()
