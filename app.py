@@ -103,13 +103,15 @@ def houses_with_query():
 
     house_list_for_given_city = getHousesWithCity(city)
 
-    total_house_count = len(house_list_for_given_city)
+    filtered_houses = [house for house in house_list_for_given_city if int(house.get('MAX_PEOPLE', 0)) >= int(number_of_peoples)]
+
+    total_house_count = len(filtered_houses)
     total_pages = (total_house_count + per_page - 1) // per_page
 
     start_index = (page - 1) * per_page
     end_index = min(page * per_page, total_house_count)
 
-    house_list_for_given_page = house_list_for_given_city[start_index:end_index]
+    house_list_for_given_page = filtered_houses[start_index:end_index]
      # Construct the final response
     response_data = {
         'houses': house_list_for_given_page,
