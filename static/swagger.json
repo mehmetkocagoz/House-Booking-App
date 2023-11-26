@@ -63,7 +63,7 @@
     },
     "/houses": {
       "get": {
-        "summary": "Get all houses",
+        "summary": "Get all houses with pagination",
         "responses": {
           "200": {
             "description": "Returns a list of houses",
@@ -75,17 +75,12 @@
                   "items": {
                     "type": "object"
                   }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "error": {
-                  "type": "string"
+                },
+                "pageNumber":{
+                  "type": "integer"
+                },
+                "totalPages":{
+                  "type":"integer"
                 }
               }
             }
@@ -95,7 +90,144 @@
     },
     "/houseswithquery": {
       "get": {
-        "summary": "Get houses with query parameters"
+        "summary": "Get houses with query parameters",
+        "parameters": [
+          {
+            "name": "city",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "City name"
+          },
+          {
+            "name": "datefrom",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "Start date"
+          },
+          {
+            "name": "dateto",
+            "in": "query",
+            "type": "string",
+            "required": true,
+            "description": "End date"
+          },
+          {
+            "name": "numberofpeople",
+            "in": "query",
+            "type": "integer",
+            "required": true,
+            "default": 1,
+            "description": "Number of people"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of houses based on query parameters",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "houses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }       
+            }       
+          }     
+        }
+      }
+    },
+    "/bookstay": {
+      "post": {
+        "summary": "Book a Stay",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "description": "Bearer token for authorization"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "houseID": {
+                  "type": "integer",
+                  "description": "ID of the house to book"
+                },
+                "date_to": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "End date for the stay"
+                },
+                "date_from": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Start date for the stay"
+                },
+                "names": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "List of names for the stay"
+                }
+              },
+              "required": ["houseID", "date_to", "date_from", "names"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booking succeed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "houseID": {
+                  "type": "integer",
+                  "description": "ID of the booked house"
+                },
+                "city": {
+                  "type": "string",
+                  "description": "City of the booked house"
+                },
+                "date_to": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "End date for the booked stay"
+                },
+                "date_from": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Start date for the booked stay"
+                },
+                "Confirmation": {
+                  "type": "string",
+                  "description": "Confirmation message"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Booking failed or invalid request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
