@@ -51,8 +51,8 @@ def login_post():
         data = request.get_json()
 
         # Extract username and password from the JSON data
-        username = data.get('houseID')
-        password = data.get('data_to')
+        username = data.get('username')
+        password = data.get('password')
 
         # Validate the credentials
         if checkUser(username,password):
