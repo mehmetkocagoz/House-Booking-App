@@ -158,9 +158,15 @@ def book_a_stay():
                 updateBookInformation(houseID)
                 return Response(json.dumps(response,indent=2),status=200,content_type='application/json; charset=utf-8')
             
+            else:
+                response={
+                    'message':'House is already booked'
+                }
+                return Response(json.dumps(response,indent=2),status=400,content_type='application/json; charset=utf-8')
+   
         else:
             response={
-                'message':'Booking failed'
+                'message':'There is no house with given ID'
             }
         return Response(json.dumps(response,indent=2),status=400,content_type='application/json; charset=utf-8')
 
