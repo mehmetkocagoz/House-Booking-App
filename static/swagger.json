@@ -154,7 +154,7 @@
         "summary": "Book a Stay",
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "token",
             "in": "query",
             "type": "string",
             "required": true,
