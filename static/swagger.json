@@ -64,6 +64,15 @@
     "/houses": {
       "get": {
         "summary": "Get all houses with pagination",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer",
+            "default": 1,
+            "description": "Page number"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Returns a list of houses",
