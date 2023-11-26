@@ -155,7 +155,7 @@
         "parameters": [
           {
             "name": "Authorization",
-            "in": "header",
+            "in": "query",
             "type": "string",
             "required": true,
             "description": "Bearer token for authorization"
