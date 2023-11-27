@@ -140,17 +140,24 @@ def bookAStayForGivenID(houseID):
     except pyodbc.Error as ex:
         sqlstate = ex.args[1]
         print(f"Error executing the query. SQLState: {sqlstate}")
-        return None
-    
-def updateBookInformation(houseID):
+        return None  
+
+
+def checkBookingWithGivenDateForHouse(houseId,date_from,date_to):
     try:
         connection = conn()
-
         if connection:
             with connection.cursor() as cursor:
-                update_query = "UPDATE houses SET isBooked = ? WHERE houseID = ?"
-                cursor.execute(update_query, ('TRUE', houseID))
-
+                check_query = "SELECT COUNT(*) FROM HouseRental WHERE houseID = ? AND date_from <= ? AND date_to >= ?"
+                cursor.execute(check_query, (houseId,date_from,date_to))
+                count = cursor.fetchone()[0]
+                if count == 0:
+                    # If no booking exists, insert the values
+                    insert_query = "INSERT INTO HouseRental (houseID, date_from, date_to) VALUES (?, ?, ?)"
+                    cursor.execute(insert_query, (houseId, date_from, date_to))
+                    return True
+                else:
+                    return False
     except pyodbc.Error as ex:
         sqlstate = ex.args[1]
         print(f"Error executing the query. SQLState: {sqlstate}")
