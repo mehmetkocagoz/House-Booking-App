@@ -139,7 +139,7 @@ def book_a_stay():
 
         if house is not None:
             # True means given house if free to book
-            if checkBookingWithGivenDateForHouse(houseID,date_from,date_to) == 'TRUE':
+            if checkBookingWithGivenDateForHouse(houseID,date_from,date_to) == True:
                 #Check if max_people of the house is less than given names length
                 if house[2] < number_of_people_in_query:
                     response ={
