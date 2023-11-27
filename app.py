@@ -1,5 +1,5 @@
 from flask import Flask,request,jsonify,Response,send_from_directory
-from db import getHouses, getHousesWithCity,checkUser,bookAStayForGivenID,updateBookInformation
+from db import getHouses, getHousesWithCity,checkUser,bookAStayForGivenID,checkBookingWithGivenDateForHouse
 import json
 import jwt
 from datetime import datetime,timedelta
@@ -138,7 +138,8 @@ def book_a_stay():
         house = bookAStayForGivenID(houseID)
 
         if house is not None:
-            if house[5] == 'FALSE':
+            # True means given house if free to book
+            if checkBookingWithGivenDateForHouse(houseID,date_from,date_to) == 'TRUE':
                 #Check if max_people of the house is less than given names length
                 if house[2] < number_of_people_in_query:
                     response ={
@@ -154,8 +155,6 @@ def book_a_stay():
                     'date_from': date_from,
                     'Confirmation': 'Booking succeed'
                 }
-                    
-                updateBookInformation(houseID)
                 return Response(json.dumps(response,indent=2),status=200,content_type='application/json; charset=utf-8')
             
             else:
