@@ -75,7 +75,7 @@ def login_post():
         return jsonify({'error': str(e)}), 400
 
 
-@app.route('/houses')
+@app.route('/houses', methods=['GET'])
 def all_houses():
 
      # Set default values for pagination
@@ -104,7 +104,7 @@ def all_houses():
     # Returning the response as JSON
     return Response(json_response, content_type='application/json; charset=utf-8')
 
-@app.route('/houseswithquery')
+@app.route('/houseswithquery', methods=['GET'])
 def houses_with_query():
     city = request.args.get('city')
     date_from = request.args.get('datefrom')

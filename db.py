@@ -42,9 +42,8 @@ def getHouses():
                         'ID': row[0],
                         'CITY': row[1],
                         'DESCRIPTION': row[3],
-                        'AMENETIES': row[4],
-                        'MAX_PEOPLE': row[2],
-                        'ISBOOKED': row[5]
+                        'AMENITIES': row[4],
+                        'MAX_PEOPLE': row[2]
                     }
                     houses_data_list.append(house_entry)
 
@@ -80,9 +79,8 @@ def getHousesWithCity(city):
                         'ID': row[0],
                         'CITY': row[1],
                         'DESCRIPTION': row[3],
-                        'AMENITIES': row[4],  # Corrected typo: 'AMENETIES' to 'AMENITIES'
-                        'MAX_PEOPLE': row[2],
-                        'IS_BOOKED': row[5]  # Adjusted to 'IS_BOOKED'
+                        'AMENITIES': row[4],
+                        'MAX_PEOPLE': row[2]
                     }
                     houses_data_list.append(house_entry)
 
