@@ -39,7 +39,7 @@ To access protected endpoints (`/bookstay`), include a JWT token in the request 
 
 ## ER-Diagram
 
-I have two different tables to demonstrate basic logic of the project.
+I have three different tables to demonstrate basic logic of the project.
 
 ![ER Diagram](ER-Diagram.PNG)
 
